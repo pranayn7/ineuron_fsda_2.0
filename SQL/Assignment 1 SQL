@@ -61,28 +61,37 @@ select * from sales_data_view;
 Q4: Create a new column called order_extract and extract the number after the last‘–‘from Order ID column.
 */
 
+create or replace view sales_data_view2 as
 select *, substr(order_id, 9) as order_extract 
-from sales_data_view ;
+from sales_data_view;
+
+select * from sales_data_view2;
 
 /*
 Q5: Create a new column called Discount Flag and categorize it based on discount.
     Use ‘Yes’ if the discount is greater than zero else ‘No’.
 */
 
+create or replace view sales_data_view3 as
 select *,
 case
     when discount > 0 then 'Yes'
     Else 'No'
 End as discount_flag
-from sales_data_view;
+from sales_data_view2;
+
+select * from sales_data_view3;
 
 /*
 Q6: Create a new column called process days and calculate how many days it takes
     for each order id to process from the order to its shipment.
 */
 
+create or replace view sales_data_view4 as
 select *, datediff('day',formatted_order_date, formatted_ship_date) as process_days
-from sales_data_view;
+from sales_data_view3;
+
+select * from sales_data_view4;
 
 /*
 Q7: Create a new column called Rating and then based on the Process dates give
@@ -95,11 +104,12 @@ Q7: Create a new column called Rating and then based on the Process dates give
     d. If process days are greater than 10 then the rating should be 2.
 */ 
 
-select *, datediff('day',formatted_order_date, formatted_ship_date) as process_days,
+select *,
 case
-    when process_days <=3 then 5
-    when process_days <= 6 and process_days > 3 then 4
-    when process_days <= 10 and process_days > 6 then 3
-    Else 2
+    when process_days > 0 and process_days <=3 then '5'
+    when process_days <= 6 and process_days > 3 then '4'
+    when process_days <= 10 and process_days > 6 then '3'
+    when process_days < 0 then 'Invalid'                  -- created extra condition for negative process days 
+    Else '2'
 End as rating
-from sales_data_view;
+from sales_data_view4;
